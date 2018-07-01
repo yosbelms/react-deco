@@ -1,6 +1,6 @@
 {
   "name": "react-declarative-flow",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "React declarative control flow",
   "main": "lib/index.js",
   "license": "MIT",
