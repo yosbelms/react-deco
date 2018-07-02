@@ -2,6 +2,7 @@
   "name": "react-declarative-flow",
   "version": "0.1.0",
   "description": "React declarative control flow",
+  "repository": "https://github.com/yosbelms/react-declarative-flow.git",
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
@@ -27,5 +28,17 @@
     "jasmine-enzyme": "^6.0.2",
     "jsdom": "^11.11.0",
     "react-dom": "^16.4.1"
-  }
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "jsx",
+    "view",
+    "component",
+    "declarative",
+    "control flow",
+    "conditional",
+    "loop",
+    "map"
+  ]
 }
