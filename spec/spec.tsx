@@ -34,11 +34,6 @@ describe('If', () => {
     expect(wrapper.find('.else').length).toBe(1)
   })
 
-  it('should accept a predicate as `test`', () => {
-    const wrapper = mount(<RenderIf test={() => true}/>)
-    expect(wrapper.find('.then').length).toBe(1)
-  })
-
   it('should accept a components in `then` and `else`', () => {
     const wrapper = mount(<RenderIfWithComponents test={true} />)
     expect(wrapper.find('.then').length).toBe(1)
