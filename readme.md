@@ -40,7 +40,7 @@ function renderTableBody(products) {
 }
 ```
 
-With this library the above code wil turn into:
+With this library will turn the above code into:
 
 ```tsx
 function ProductTable({products}) {
@@ -84,7 +84,7 @@ Conditionally render components based on the truthy-ness of evaluating the `test
 
 ```tsx
 <If
-  test={a > b} // also accepts a predicate function
+  test={a > b}
   then={'a is greater then b'}
   else={'a is not greater than b'}
 />
