@@ -6,6 +6,82 @@ JSX is a declarative syntax to compose virtual-dom pieces of views. But, sometim
 
 This library is an approach to be more declarative and idiomatic.
 
+Lets write a simple table of products with two columns `Name` and `In Stock`. If `In Stock` is `0` then a message `Out of Stock` should be displayed. Currently we should write something like the following:
+
+```tsx
+function ProductTable({products}) {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>In Stock</th>
+        </tr>
+      </thead>
+      {renderTableBody(products)}
+    </table>
+  )
+}
+
+function renderTableBody(products) {
+  return (
+    <tbody>
+    {products.map((product) =>
+      <tr>
+        <td>{product.name}</td>
+        {(product.inStock > 0)
+          ? <td>{product.inStock}</td>
+          : <td>Out of Stock</td>
+        }
+      </tr>
+    )}
+    </tbody>
+  )
+}
+```
+
+With this library the above code wil turn into:
+
+```tsx
+function ProductTable({products}) {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>In Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+      <Map target={products} with={(product) =>
+        <tr>
+          <td>{product.name}</td>
+          <If test={product.inStock > 0}
+            then={<td>{product.inStock}</td>}
+            else={<td>Out of Stock</td>}
+          />
+        </tr>
+      }/>
+      </tbody>
+    </table>
+  )
+}
+```
+
+## Install
+
+```
+// with yarn
+yarn add react-declarative-flow
+
+// with npm
+npm install react-declarative-flow
+```
+
+## If
+
+Conditionally render components based on the truthy-ness of evaluating the `test` prop. Render `then` if `test` evaluates to truthy, render `else` otherwise.
+
 ```tsx
 <If
   test={a > b} // also accepts a predicate function
@@ -13,6 +89,10 @@ This library is an approach to be more declarative and idiomatic.
   else={'a is not greater than b'}
 />
 ```
+
+## Map
+
+Render the result of dispatching to the `map` method of `target` passing the `with` function as the first argument.
 
 ```tsx
 <Map target={[1, 2, 3]} with={(item) =>
