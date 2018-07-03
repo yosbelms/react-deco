@@ -1,10 +1,10 @@
 # React declarative control flow
 
-This library takes advantage of React Higher Order Componets, and Render-Props pattern to make possible to write conditionals and loops in a more idiomatic and declarative way while reducing visual cluttering.
+`React declarative flow` is a library that aims to make React views more declarative, idiomatic, easy to read, and easy to write.
 
 JSX is a declarative syntax to compose virtual-dom pieces of views. But, sometimes we need to put some logic down, for example, conditionally render components, or show them as a result of looping a list of values. JSX proposes either to create a new component/function to handle that logic, or intermix JS code inside the view.
 
-This library is an approach to be more declarative and idiomatic.
+This library takes advantage of React Higher Order Componets, and Render-Props pattern to make possible to write conditionals and loops in a more declarative way while reducing visual cluttering.
 
 Lets write a simple table of products with two columns `Name` and `In Stock`. If `In Stock` is `0` then a message `Out of Stock` should be displayed. Currently we should write something like the following:
 
