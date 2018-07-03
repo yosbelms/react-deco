@@ -1,6 +1,6 @@
 {
   "name": "react-declarative-flow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React declarative control flow",
   "repository": "https://github.com/yosbelms/react-declarative-flow.git",
   "main": "lib/index.js",
