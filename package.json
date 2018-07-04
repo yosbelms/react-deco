@@ -1,8 +1,8 @@
 {
-  "name": "react-declarative-flow",
+  "name": "react-deco",
   "version": "0.1.2",
   "description": "React declarative control flow",
-  "repository": "https://github.com/yosbelms/react-declarative-flow.git",
+  "repository": "https://github.com/yosbelms/react-deco.git",
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {

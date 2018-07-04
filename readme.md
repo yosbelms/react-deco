@@ -1,6 +1,6 @@
-# React declarative control flow
+# React Deco
 
-`React declarative flow` is a library that aims to make React views more declarative, idiomatic, easy to read, and easy to write.
+`React Deco` is a library that aims to make React views more declarative, idiomatic, easy to read, and easy to write.
 
 JSX is a declarative syntax to compose virtual-dom pieces of views. But, sometimes we need to put some logic down, for example, conditionally render components, or show them as a result of looping a list of values. JSX proposes either to create a new component/function to handle that logic, or intermix JS code inside the view.
 
@@ -72,10 +72,10 @@ function ProductTable({products}) {
 
 ```
 // with yarn
-yarn add react-declarative-flow
+yarn add react-deco
 
 // with npm
-npm install react-declarative-flow
+npm install react-deco
 ```
 
 ## If
