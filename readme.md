@@ -4,7 +4,7 @@
 
 JSX is a declarative syntax to compose virtual-dom pieces of views. Sometimes it is necessary to put some logic down, for example, conditionally render components, or show them as a result of looping a list of values. JSX proposes either to create a new component/function to handle that logic, or intermix JS code inside the view.
 
-This library takes advantage of Render-Props pattern effectively used by [React Router](https://reacttraining.com/react-router/web/api/Route) and [Downshift](https://github.com/paypal/downshift) to make possible to write conditionals and loops in a more declarative way while reducing visual cluttering.
+This library takes advantage of Render-Props pattern (effectively used by [React Router](https://reacttraining.com/react-router/web/api/Route) and [Downshift](https://github.com/paypal/downshift)) to make possible to write conditionals and loops in a more declarative way while reducing visual cluttering.
 
 Lets write a simple table of products with two columns `Name` and `In Stock`. If `In Stock` is `0` then a message `Out of Stock` should be displayed. Currently we should write something like the following:
 
