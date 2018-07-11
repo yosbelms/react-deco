@@ -3,6 +3,12 @@ import { ReactElement, createElement } from 'react'
 import * as PropTypes from 'prop-types'
 import * as shallowEqual from 'fbjs/lib/shallowEqual'
 
+export interface Mapper<T> {
+  <U>(value: T) : U
+  <U>(value: T, key: number) : U
+  <U>(value: T, key: number, target: T[]) : U
+}
+
 function isFunction(v) {
   return typeof v === 'function'
 }
@@ -39,7 +45,7 @@ export function If({ test, then, 'else': _else }: {
  */
 export function Map<T>({ target, 'with': _with }: {
   target: T[],
-  with: <U>(value?: T, key?: number | string, target?: U[]) => any
+  with: Mapper<T>
 }): ReactElement<any> {
   return createElement(React.Fragment, null, target.map(_with))
 }
