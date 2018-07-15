@@ -4,9 +4,9 @@ import * as PropTypes from 'prop-types'
 import * as shallowEqual from 'fbjs/lib/shallowEqual'
 
 export interface Mapper<T> {
-  <U>(value: T) : U
-  <U>(value: T, key: number) : U
-  <U>(value: T, key: number, target: T[]) : U
+  <U>(value: T): U
+  <U>(value: T, key: number): U
+  <U>(value: T, key: number, target: T[]): U
 }
 
 function isFunction(v) {
@@ -20,6 +20,8 @@ function defaultToNull(v: any) {
 function toElement(c, data = void 0) {
   return defaultToNull(isFunction(c) ? c(data) : c)
 }
+
+const isArray = Array.isArray
 
 /**
  * Conditionally render components based on the truthy-ness of evaluating the `test` prop.
@@ -75,10 +77,20 @@ export class Pure extends React.Component<
 
   shouldComponentUpdate(nextProps, _) {
     const nextTest = nextProps.test
-    const should = !shallowEqual(this.previousTest, nextTest)
+    const previousTest = this.previousTest
+    let should
+
+    if (isArray(nextTest) && isArray(previousTest)) {
+      should = nextTest.reduce((shd, a, idx) =>
+        shd || !shallowEqual(a, previousTest[idx] as any[]), false)
+    } else {
+      should = !shallowEqual(this.previousTest, nextTest)
+    }
+
     if (should) {
       this.previousTest = nextTest
     }
+
     return should
   }
 
