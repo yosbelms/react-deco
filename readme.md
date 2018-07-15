@@ -78,6 +78,18 @@ yarn add react-deco
 npm install react-deco
 ```
 
+## Usage
+```ts
+// ES2015+ and TS
+import {If, Map, Pure} from 'react-deco'
+
+// CommonJS
+var ReactDeco = require('react-deco')
+var If = ReactDeco.If
+var Map = ReactDeco.Map
+var Pure = ReactDeco.Pure
+```
+
 ## If
 
 Conditionally render components based on the truthy-ness of evaluating the `test` prop. Render `then` if `test` evaluates to truthy, render `else` otherwise.
