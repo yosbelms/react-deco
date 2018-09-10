@@ -1,6 +1,6 @@
 {
   "name": "react-deco",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "React declarative control flow",
   "repository": "https://github.com/yosbelms/react-deco.git",
   "main": "lib/index.js",
