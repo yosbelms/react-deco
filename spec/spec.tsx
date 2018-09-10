@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { If, Map, Pure } from '../src'
+import { If, Map, Switch, When, Bare } from '../src'
 import { mount } from 'enzyme'
 
 function RenderIf({ test }: { test: any }) {
@@ -64,27 +64,147 @@ describe('Map', () => {
 
 })
 
-function RenderPure({ test }: { test: any }) {
+describe('Switch', () => {
+  it('Should mount the first When element which test is truthy', () => {
+    let wrapper = mount(
+      <Switch>
+        <When test={true} render={() => <div className='div' />} />
+        <When test={false} render={() => <div />} />
+      </Switch>
+    )
+
+    let res = wrapper.find('.div')
+    expect(res.length).toBe(1)
+
+    wrapper.unmount()
+
+    wrapper = mount(
+      <Switch>
+        <When test={false} render={() => <div className='div' />} />
+        <When test={true} render={() => <div />} />
+      </Switch>
+    )
+
+    res = wrapper.find('.div')
+    expect(res.length).toBe(0)
+
+    wrapper.unmount()
+  })
+
+  it('When, should allow functions as test', () => {
+    let wrapper = mount(
+      <Switch>
+        <When test={() => false} render={() => <div className='div' />} />
+      </Switch>
+    )
+
+    let res = wrapper.find('.div')
+    expect(res.length).toBe(0)
+
+    wrapper.unmount()
+  })
+})
+
+
+describe('Bare', () => {
+  it('Should execute constructor prop function on construct', () => {
+    let executed
+    let wrapper = mount(
+      <Bare constructor={() => executed = true} render={'blah'} />
+    )
+
+    expect(executed).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('Should execute didCatch prop function on error', () => {
+    let caugh
+    let wrapper = mount(
+      <Bare didCatch={() => caugh = true} render={() =>
+        <Bare render={() => { throw new Error('boom') }} />
+      } />
+    )
+
+    expect(caugh).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('Should execute lifecycle in order', () => {
+    let counter = 1
+    const count = () => counter++
+    let lifecycle = {
+      didMount: 0,
+      didUpdate: 0,
+      shouldUpdate: 0,
+      willUnmount: 0
+    }
+
+    let wrapper = mount(
+      <Bare
+        didMount={() => lifecycle.didMount = count()}
+        didUpdate={() => lifecycle.didUpdate = count()}
+        shouldUpdate={() => lifecycle.shouldUpdate = count()}
+        willUnmount={() => lifecycle.willUnmount = count()}
+
+        render={'blah'}
+      />
+    )
+
+    // force update
+    wrapper.setState({})
+
+    wrapper.unmount()
+
+    expect(lifecycle).toEqual({
+      didMount: 1,
+      didUpdate: 3,
+      shouldUpdate: 2,
+      willUnmount: 4
+    })
+  })
+
+  it('Should prevent rerendering by returning false in shouldUpdate', () => {
+    let updated
+    let wrapper = mount(
+      <Bare
+        didUpdate={() => updated = true}
+        shouldUpdate={() => false}
+        render={'blah'}
+      />
+    )
+
+    // force update
+    wrapper.setState({})
+
+    expect(updated).toBeUndefined()
+
+    wrapper.unmount()
+  })
+})
+
+function RenderPure({ pureBy }: { pureBy: any }) {
   const rand = Math.random()
   return (
-    <Pure test={test} render={
+    <Bare pureBy={pureBy} render={
       <div className='div' data-rand={rand} />
     } />
   )
 }
 
-function RenderPurePassingProps({ test }: { test: any }) {
+function RenderPureWithFunctionBody({ pureBy }: { pureBy: any }) {
   return (
-    <Pure test={test} render={(cls) =>
-      <div className={cls} />
+    <Bare pureBy={pureBy} render={(cmp) =>
+      <div className={cmp.props.pureBy} />
     } />
   )
 }
 
-describe('Pure', () => {
+describe('Bare with pureBy', () => {
 
-  it('should update only if `test` id changed', () => {
-    let wrapper = mount(<RenderPure test={['a', 'b']} />)
+  it('should update only if `pureBy` is changed', () => {
+    let wrapper = mount(<RenderPure pureBy={['a', 'b']} />)
 
     let div = wrapper.find('.div').getDOMNode()
     expect(div).toBeTruthy()
@@ -98,7 +218,7 @@ describe('Pure', () => {
     expect(div.getAttribute('data-rand')).toBe(rand)
 
     // rerender
-    wrapper.setProps({ test: ['b', 'a'] })
+    wrapper.setProps({ pureBy: ['b', 'a'] })
 
     div = wrapper.find('.div').getDOMNode()
     expect(div.getAttribute('data-rand')).not.toBe(rand)
@@ -106,8 +226,8 @@ describe('Pure', () => {
     wrapper.unmount()
   })
 
-  it('should pass tested values to `render` if it is a function', () => {
-    let wrapper = mount(<RenderPurePassingProps test={'div'} />)
+  it('should work if `render` is a function', () => {
+    let wrapper = mount(<RenderPureWithFunctionBody pureBy={'div'} />)
 
     let res = wrapper.find('.div')
     expect(res.length).toBe(1)

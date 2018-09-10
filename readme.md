@@ -1,8 +1,9 @@
 # React Deco
 
-*React Deco* is a library that aims to make React complex views more declarative, idiomatic, easy to read, and easy to write, by consequence more mantainables.
+*React Deco* Give back to JSX what is JSX’s
 
-JSX is a declarative syntax to compose virtual-dom pieces of views. Sometimes it is necessary to put some logic down, for example, conditionally render components, or show them as a result of looping a list of values. JSX proposes either to create a new component/function to handle that logic, or intermix JS code inside the view.
+
+*React Deco* is a library that aims to make React complex views more declarative, idiomatic, easy to read, and easy to write, by consequence more mantainables.
 
 This library takes advantage of Render-Props pattern (effectively used by [React Router](https://reacttraining.com/react-router/web/api/Route) and [Downshift](https://github.com/paypal/downshift)) to make possible to write conditionals and loops in a more declarative way while reducing visual cluttering.
 
@@ -81,13 +82,13 @@ npm install react-deco
 ## Usage
 ```ts
 // ES2015+ and TS
-import {If, Map, Pure} from 'react-deco'
+import {If, Map, Bare} from 'react-deco'
 
 // CommonJS
 var ReactDeco = require('react-deco')
 var If = ReactDeco.If
 var Map = ReactDeco.Map
-var Pure = ReactDeco.Pure
+var Bare = ReactDeco.Bare
 ```
 
 ## If
@@ -121,13 +122,40 @@ Render the result of dispatching to the `map` method of `target` passing the `wi
 } />
 ```
 
-## Pure
+## Bare
 
-Re-render the content of the `render` prop if the value of `test` is not shallow-equal to the `test` value provided in the previous render.
+A component that its `constructor`, `shouldComponentUpdate`, and lifecycle methods can be assigned via props
 
 ```tsx
-// will re-render only if `account.code` changes
-<Pure test={account.code} render={(code) =>
-  <div>{code}</div>
+<Bare shouldUpdate={shouldUpdateFn} render={() =>
+  ...
 } />
 ```
+
+`Bare` componets accept the following props:
+
+* `render`
+* `constructor`
+* `didCatch`
+* `didMount`
+* `didUpdate`
+* `shouldUpdate`
+* `willUnmount`
+
+The functions provided to those props receives the component instance as the first parametter, the rest are the corresponding arguments passed by React.
+
+Additionaly, `Bare` components accepts a prop named `pureBy`. In case this property is provided the passed value will be used to compute the component purity using shallow comparison, if it is an array the shallow comparison will be computed by shallow-comparing each value in the array.
+
+```tsx
+<Bare pureBy={client} render={() =>
+  <div>{client.name}</div>
+  <div>{client.age}</div>
+} />
+```
+
+The above code will re-render only if one of the properties of the `client` object is different.
+
+
+Published under MIT Licence
+
+(c) Yosbel Marin 2018

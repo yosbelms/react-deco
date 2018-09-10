@@ -21,6 +21,25 @@ function toElement(c, data = void 0) {
   return defaultToNull(isFunction(c) ? c(data) : c)
 }
 
+function toBoolean(v) {
+  return Boolean(isFunction(v) ? v() : v)
+}
+
+function shallowDifferent(prev, next) {
+  let different
+  if (isArray(next) && isArray(prev)) {
+    different = next.reduce((shd, a, idx) =>
+      shd || !shallowEqual(a, prev[idx] as any[]), false)
+  } else {
+    different = !shallowEqual(prev, next)
+  }
+  return different
+}
+
+function prependArg(fn, arg) {
+  return (...args) => fn(arg, ...args)
+}
+
 const isArray = Array.isArray
 
 /**
@@ -41,6 +60,38 @@ export function If({ test, then, 'else': _else }: {
   else: PropTypes.any
 }
 
+export function Switch({ children }: { children: any }) {
+  let choice
+
+  React.Children.forEach(children, child => {
+    if (
+      choice === void 0 &&
+      React.isValidElement(child) &&
+      (child.type as any).isWhen &&
+      toBoolean((child.props as any).test)
+    ) {
+      choice = child
+    }
+  })
+
+  return toElement(choice ? choice.props.render : null)
+}
+
+export function When(_: {
+  test: any
+  render: () => any
+}) {
+  return null
+}
+
+(When as any).isWhen = true;
+
+(When as any).propTypes = {
+  test: PropTypes.any.isRequired,
+  render: PropTypes.any.isRequired
+}
+
+
 /**
  * Render the result of dispatching to the `map` method of `target`
  * passing the `with` function as the first argument.
@@ -58,48 +109,88 @@ export function Map<T>({ target, 'with': _with }: {
 }
 
 /**
- * Re-render the content of the `render` prop if the value of `test` is not shallow-equal
- * to the `test` value provided in the previous render.
+ * A component that its `constructor`, `shouldComponentUpdate`, and lifecycle methods
+ * can be assigned via props
  */
-export class Pure extends React.Component<
-  {
-    test: any
-    render: any
-  }
-  > {
+export class Bare extends React.Component<{
+  render: any
+  constructor?: Function,
+  pureBy?: any
+  didCatch?: (...args: any[]) => any
+  didMount?: (...args: any[]) => any
+  didUpdate?: (...args: any[]) => any
+  shouldUpdate?: (...args: any[]) => any
+  willUnmount?: (...args: any[]) => any
+}> {
 
-  previousTest: any = null
+  previousPuritySource: any = null
 
-  constructor(props, context) {
-    super(props, context)
-    this.previousTest = props.test
-  }
+  constructor(props, ctx) {
+    super(props, ctx)
+    const {
+      constructor,
+      pureBy,
+      didCatch,
+      didMount,
+      didUpdate,
+      shouldUpdate,
+      willUnmount
+    } = props
 
-  shouldComponentUpdate(nextProps, _) {
-    const nextTest = nextProps.test
-    const previousTest = this.previousTest
-    let should
-
-    if (isArray(nextTest) && isArray(previousTest)) {
-      should = nextTest.reduce((shd, a, idx) =>
-        shd || !shallowEqual(a, previousTest[idx] as any[]), false)
-    } else {
-      should = !shallowEqual(this.previousTest, nextTest)
+    if (isFunction(constructor)) {
+      constructor(this, props, ctx)
     }
 
-    if (should) {
-      this.previousTest = nextTest
+    if (isFunction(didCatch)) {
+      this.componentDidCatch = prependArg(didCatch, this)
     }
 
-    return should
+    if (isFunction(didMount)) {
+      this.componentDidMount = prependArg(didMount, this)
+    }
+
+    if (isFunction(didUpdate)) {
+      this.componentDidUpdate = prependArg(didUpdate, this)
+    }
+
+    if (pureBy !== void 0) {
+      if (shouldUpdate !== void 0) {
+        throw new Error('You can only use either `shouldUpdate`, or `pureBy` prop in Bare components')
+      }
+
+      this.previousPuritySource = pureBy
+      this.shouldComponentUpdate = function shouldComponentUpdate(nextProps, _) {
+        const nextPuritySource = nextProps.pureBy
+        const previousPuritySource = this.previousPuritySource
+        const should = shallowDifferent(nextPuritySource, previousPuritySource)
+
+        if (should) {
+          this.previousPuritySource = nextPuritySource
+        }
+
+        return should
+      }
+    } else if (isFunction(shouldUpdate)) {
+      this.shouldComponentUpdate = prependArg(shouldUpdate, this)
+    }
+
+    if (isFunction(willUnmount)) {
+      this.componentWillUnmount = prependArg(willUnmount, this)
+    }
   }
 
   render() {
-    return toElement(this.props.render, this.previousTest)
+    return toElement(this.props.render, this)
   }
 }
 
-(Pure as any).propTypes = {
-  test: PropTypes.any.isRequired,
-  render: PropTypes.any.isRequired
+(Bare as any).propTypes = {
+  render: PropTypes.any.isRequired,
+  constructor: PropTypes.func,
+  pureBy: PropTypes.any,
+  didCatch: PropTypes.func,
+  didMount: PropTypes.func,
+  didUpdate: PropTypes.func,
+  shouldUpdate: PropTypes.func,
+  willUnmount: PropTypes.func
 }
