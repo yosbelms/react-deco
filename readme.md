@@ -112,6 +112,17 @@ Passign functions in `then` and `else` makes the rendering process more efficien
 />
 ```
 
+## Switch/When
+
+Render the first `When` child whose`test` prop evaluates to `true`.
+
+```tsx
+<Switch>
+  <When test={a > 1} render={() => <div> Foo </div>} />
+  <When test={true} render={() => <div> Default </div>} />
+</Switch>
+```
+
 ## Map
 
 Render the result of dispatching to the `map` method of `target` passing the `with` function as the first argument.

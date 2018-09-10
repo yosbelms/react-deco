@@ -60,6 +60,9 @@ export function If({ test, then, 'else': _else }: {
   else: PropTypes.any
 }
 
+/**
+ * Render the first `When` child whose`test` prop evaluates to true.
+ */
 export function Switch({ children }: { children: any }) {
   let choice
 
