@@ -1,7 +1,7 @@
 {
   "name": "react-deco",
   "version": "0.6.0",
-  "description": "React declarative control flow",
+  "description": "Declarative JSX glorification",
   "repository": "https://github.com/yosbelms/react-deco.git",
   "main": "lib/index.js",
   "license": "MIT",

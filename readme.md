@@ -2,6 +2,16 @@
 
 *React Deco* Give back to JSX what is JSX’s
 
+* [Overview](#overview)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Components](#components)
+  * [If](#if)
+  * [Switch/When](#switch/when)
+  * [Map](#map)
+  * [Bare](#bare)
+
+## Overview
 
 *React Deco* is a library that aims to make React complex views more declarative, idiomatic, easy to read, and easy to write, by consequence more mantainables.
 
@@ -41,7 +51,7 @@ function renderTableBody(products) {
 }
 ```
 
-With this library will turn the above code into:
+This library will turn the above code into:
 
 ```tsx
 function ProductTable({products}) {
@@ -69,7 +79,7 @@ function ProductTable({products}) {
 }
 ```
 
-## Install
+## Installation
 
 ```
 // with yarn
@@ -80,6 +90,7 @@ npm install react-deco
 ```
 
 ## Usage
+
 ```ts
 // ES2015+ and TS
 import {If, Map, Bare} from 'react-deco'
@@ -91,7 +102,11 @@ var Map = ReactDeco.Map
 var Bare = ReactDeco.Bare
 ```
 
-## If
+## Components
+
+React-Deco exports some primitives wich holds reusable logic, to help developers to write *presentational logic* in JSX.
+
+### If
 
 Conditionally render components based on the truthy-ness of evaluating the `test` prop. Render `then` if `test` evaluates to truthy, render `else` otherwise.
 
@@ -112,7 +127,7 @@ Passign functions in `then` and `else` makes the rendering process more efficien
 />
 ```
 
-## Switch/When
+### Switch/When
 
 Render the first `When` child whose`test` prop evaluates to `true`.
 
@@ -123,7 +138,7 @@ Render the first `When` child whose`test` prop evaluates to `true`.
 </Switch>
 ```
 
-## Map
+### Map
 
 Render the result of dispatching to the `map` method of `target` passing the `with` function as the first argument.
 
@@ -133,7 +148,7 @@ Render the result of dispatching to the `map` method of `target` passing the `wi
 } />
 ```
 
-## Bare
+### Bare
 
 A component that its `constructor`, `shouldComponentUpdate`, and lifecycle methods can be assigned via props
 
