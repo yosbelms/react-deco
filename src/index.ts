@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { ReactElement, createElement } from 'react'
-import * as PropTypes from 'prop-types'
-import * as shallowEqual from 'fbjs/lib/shallowEqual'
+import * as PropTypes from 'prop-types';
+import * as React from 'react';
+import { createElement, ReactElement } from 'react';
+import { shallowEqual } from './util';
 
 export interface Mapper<T> {
   <U>(value: T): U
@@ -93,7 +93,6 @@ export function When(_: {
   test: PropTypes.any,
   render: PropTypes.any.isRequired
 }
-
 
 /**
  * Render the result of dispatching to the `map` method of `target`
