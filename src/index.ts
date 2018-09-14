@@ -55,7 +55,7 @@ export function If({ test, then, 'else': _else }: {
 }
 
 (If as any).propTypes = {
-  test: PropTypes.any.isRequired,
+  test: PropTypes.any,
   then: PropTypes.any.isRequired,
   else: PropTypes.any
 }
@@ -90,7 +90,7 @@ export function When(_: {
 (When as any).isWhen = true;
 
 (When as any).propTypes = {
-  test: PropTypes.any.isRequired,
+  test: PropTypes.any,
   render: PropTypes.any.isRequired
 }
 
