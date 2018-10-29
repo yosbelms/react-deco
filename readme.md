@@ -10,6 +10,7 @@
   * [Switch/When](#switch/when)
   * [Map](#map)
   * [Bare](#bare)
+  * [Await](#await)
 
 ## Overview
 
@@ -181,6 +182,24 @@ Additionaly, `Bare` components accepts a prop named `pureBy`. In case this prope
 
 The above code will re-render only if one of the properties of the `client` object is different.
 
+
+### Await
+
+Render components based on the state of a promise. Renders `then` prop when the promise is resolved. Renders `catch` prop when the promise is rejected. Renders `placeholder` while the promise is not resolved nor rejected.
+
+```tsx
+const usersPromise = fetch('users')
+<Await promise={usersPromise} then={users =>
+  ...
+} />
+```
+
+`Await` componets accept the following props:
+
+* `promise`
+* `then`
+* `catch`
+* `placeholder`
 
 Published under MIT Licence
 

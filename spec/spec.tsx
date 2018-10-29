@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { If, Map, Switch, When, Bare } from '../src'
+import { If, Map, Switch, When, Bare, Await } from '../src'
 import { mount } from 'enzyme'
 
 function RenderIf({ test }: { test: any }) {
   return (
-    <If test={test}
+    <If
+      test={test}
       then={<div className='then' />}
       else={<div className='else' />}
     />
@@ -13,7 +14,8 @@ function RenderIf({ test }: { test: any }) {
 
 function RenderIfWithComponents({ test }: { test: any }) {
   return (
-    <If test={test}
+    <If
+      test={test}
       then={() => <div className='then' />}
       else={() => <div className='else' />}
     />
@@ -21,7 +23,6 @@ function RenderIfWithComponents({ test }: { test: any }) {
 }
 
 describe('If', () => {
-
   it('should render `then` if `test` is truthy', () => {
     const wrapper = mount(<RenderIf test={true} />)
     expect(wrapper.find('.then').length).toBe(1)
@@ -47,21 +48,20 @@ describe('If', () => {
     expect(wrapperwc.find('.else').length).toBe(1)
     wrapperwc.unmount()
   })
-
 })
 
-
 describe('Map', () => {
-
   it('should work', () => {
-    const wrapper = mount(<Map target={[1, 2, 3]} with={(item: number) =>
-      <div key={item} className={'item'} />
-    } />)
+    const wrapper = mount(
+      <Map
+        target={[1, 2, 3]}
+        with={(item: number) => <div key={item} className={'item'} />}
+      />
+    )
 
     expect(wrapper.find('.item').length).toBe(3)
     wrapper.unmount()
   })
-
 })
 
 describe('Switch', () => {
@@ -105,12 +105,11 @@ describe('Switch', () => {
   })
 })
 
-
 describe('Bare', () => {
   it('Should execute constructor prop function on construct', () => {
     let executed
     let wrapper = mount(
-      <Bare constructor={() => executed = true} render={'blah'} />
+      <Bare constructor={() => (executed = true)} render={'blah'} />
     )
 
     expect(executed).toBe(true)
@@ -121,9 +120,16 @@ describe('Bare', () => {
   it('Should execute didCatch prop function on error', () => {
     let caugh
     let wrapper = mount(
-      <Bare didCatch={() => caugh = true} render={() =>
-        <Bare render={() => { throw new Error('boom') }} />
-      } />
+      <Bare
+        didCatch={() => (caugh = true)}
+        render={() => (
+          <Bare
+            render={() => {
+              throw new Error('boom')
+            }}
+          />
+        )}
+      />
     )
 
     expect(caugh).toBe(true)
@@ -143,11 +149,10 @@ describe('Bare', () => {
 
     let wrapper = mount(
       <Bare
-        didMount={() => lifecycle.didMount = count()}
-        didUpdate={() => lifecycle.didUpdate = count()}
-        shouldUpdate={() => lifecycle.shouldUpdate = count()}
-        willUnmount={() => lifecycle.willUnmount = count()}
-
+        didMount={() => (lifecycle.didMount = count())}
+        didUpdate={() => (lifecycle.didUpdate = count())}
+        shouldUpdate={() => (lifecycle.shouldUpdate = count())}
+        willUnmount={() => (lifecycle.willUnmount = count())}
         render={'blah'}
       />
     )
@@ -169,7 +174,7 @@ describe('Bare', () => {
     let updated
     let wrapper = mount(
       <Bare
-        didUpdate={() => updated = true}
+        didUpdate={() => (updated = true)}
         shouldUpdate={() => false}
         render={'blah'}
       />
@@ -187,22 +192,20 @@ describe('Bare', () => {
 function RenderPure({ pureBy }: { pureBy: any }) {
   const rand = Math.random()
   return (
-    <Bare pureBy={pureBy} render={
-      <div className='div' data-rand={rand} />
-    } />
+    <Bare pureBy={pureBy} render={<div className='div' data-rand={rand} />} />
   )
 }
 
 function RenderPureWithFunctionBody({ pureBy }: { pureBy: any }) {
   return (
-    <Bare pureBy={pureBy} render={(cmp) =>
-      <div className={cmp.props.pureBy} />
-    } />
+    <Bare
+      pureBy={pureBy}
+      render={cmp => <div className={cmp.props.pureBy} />}
+    />
   )
 }
 
 describe('Bare with pureBy', () => {
-
   it('should update only if `pureBy` is changed', () => {
     let wrapper = mount(<RenderPure pureBy={['a', 'b']} />)
 
@@ -233,6 +236,82 @@ describe('Bare with pureBy', () => {
     expect(res.length).toBe(1)
 
     wrapper.unmount()
+  })
+})
+
+describe('Await', () => {
+  it('should pass the promise value to the `then` prop', (done) => {
+    const promise = Promise.resolve('then')
+    const wrapper = mount(
+      <Await
+        promise={promise}
+        then={(cls: string) => <div className={cls} />}
+      />
+    )
+
+    setTimeout(() => {
+      const div = wrapper.find('.then')
+      expect(div).toBeTruthy()
+      wrapper.unmount()
+      done()
+    })
+  })
+
+  it('should pass the reject reason `catch` prop', (done) => {
+    const promise = Promise.reject('error')
+    const wrapper = mount(
+      <Await
+        promise={promise}
+        then={() => null}
+        catch={cls => <div className={cls} />}
+      />
+    )
+
+    setTimeout(() => {
+      const div = wrapper.find('.error')
+      expect(div).toBeTruthy()
+      wrapper.unmount()
+      done()
+    })
+  })
+
+  it('should render placeholder if the promise is not still resolved', (done) => {
+    const promise = Promise.resolve(0)
+    const wrapper = mount(
+      <Await
+        promise={promise}
+        then={() => <div className='then' />}
+        placeholder={() => <div className='placeholder' />}
+      />
+    )
+
+    const div = wrapper.find('.then')
+    expect(div).toBeTruthy()
+
+    setTimeout(() => {
+      const div = wrapper.find('.placeholder')
+      expect(div).toBeTruthy()
+      wrapper.unmount()
+      done()
+    })
+  })
+
+  it('should render placeholder if the promise is never resolved', (done) => {
+    const promise = new Promise(() => void 0)
+    const wrapper = mount(
+      <Await
+        promise={promise}
+        then={() => null}
+        placeholder={() => <div className='placeholder' />}
+      />
+    )
+
+    setTimeout(() => {
+      const div = wrapper.find('.placeholder')
+      expect(div).toBeTruthy()
+      wrapper.unmount()
+      done()
+    })
   })
 
 })
