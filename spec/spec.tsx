@@ -187,6 +187,31 @@ describe('Bare', () => {
 
     wrapper.unmount()
   })
+
+  it('setState should be binded to the component', () => {
+    let wrapper = mount(
+      <Bare
+        constructor={cmp =>
+          cmp.state = {counter: 0}
+        }
+        didUpdate={({state, setState}) => {
+          if (state.counter === 0) {
+            setState({counter: state.counter + 1})
+          }
+        }}
+        render={'blah'}
+      />
+    )
+
+    expect(wrapper.state()).toEqual({counter: 0})
+
+    // force update
+    wrapper.setState({})
+
+    expect(wrapper.state()).toEqual({counter: 1})
+
+    wrapper.unmount()
+  })
 })
 
 function RenderPure({ pureBy }: { pureBy: any }) {

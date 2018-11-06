@@ -48,6 +48,8 @@ export class Bare extends React.Component<{
       willUnmount
     } = props
 
+    this.setState = this.setState.bind(this)
+
     if (isFunction(constructor)) {
       constructor(this, props, ctx)
     }
