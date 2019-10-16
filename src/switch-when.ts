@@ -12,7 +12,7 @@ export function Switch({ children }: { children: any }) {
     if (
       choice === void 0 &&
       React.isValidElement(child) &&
-      (child.type as any).isWhen &&
+      (child.type as any)._isWhen &&
       toBoolean((child.props as any).test)
     ) {
       choice = child
@@ -29,7 +29,7 @@ export function When(_: {
   return null
 }
 
-(When as any).isWhen = true;
+(When as any)._isWhen = true;
 
 (When as any).propTypes = {
   test: PropTypes.any,

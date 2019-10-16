@@ -161,15 +161,13 @@ A component that its `constructor`, `shouldComponentUpdate`, and lifecycle metho
 
 `Bare` componets accept the following props:
 
-* `render`
-* `constructor`
-* `didCatch`
-* `didMount`
-* `didUpdate`
-* `shouldUpdate`
-* `willUnmount`
-
-The functions provided to those props receives the component instance as the first parametter, the rest are the corresponding arguments passed by React.
+* `render`: `render(self)`
+* `constructor`: `constructor(self, props, ctx)`
+* `didCatch`: `didCatch(self)`
+* `didMount`: `didMount(self)`
+* `didUpdate`: `didUpdate(self, prevState)`
+* `shouldUpdate`: `shouldUpdate(self, nextState)`
+* `willUnmount`: `willUnmount(self)`
 
 Additionaly, `Bare` components accepts a prop named `pureBy`. In case this property is provided the passed value will be used to compute the component purity using shallow comparison, if it is an array the shallow comparison will be computed by shallow-comparing each value in the array.
 
@@ -181,6 +179,16 @@ Additionaly, `Bare` components accepts a prop named `pureBy`. In case this prope
 ```
 
 The above code will re-render only if one of the properties of the `client` object is different.
+
+Bare components also contains a self reference called `self`, frequently useful to keep a reference to the component while destructuring in lifecycle params, example:
+
+```tsx
+<Bare pureBy={client} didMount={({setState, self, state}) =>
+  // use self
+} />
+```
+
+`setState` can be used inside the constructor
 
 
 ### Await
