@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { If, Map, Switch, When, Bare, Await } from '../src'
 import { mount } from 'enzyme'
+import 'jasmine'
 
 function RenderIf({ test }: { test: any }) {
   return (
@@ -122,16 +123,13 @@ describe('Bare', () => {
     let wrapper = mount(
       <Bare
         didCatch={() => (caugh = true)}
-        render={() => (
-          <Bare
-            render={() => {
-              throw new Error('boom')
-            }}
-          />
-        )}
+        render={() =>
+          <Bare render={'boom'} />
+        }
       />
     )
 
+    wrapper.find(Bare).at(1).simulateError(new Error())
     expect(caugh).toBe(true)
 
     wrapper.unmount()
@@ -188,27 +186,40 @@ describe('Bare', () => {
     wrapper.unmount()
   })
 
+  it('setState should can be used iside constructor', () => {
+    let wrapper = mount(
+      <Bare
+        constructor={({ setState }) => setState({ counter: 0 })}
+        render={'blah'}
+      />
+    )
+
+    expect(wrapper.state()).toEqual({ counter: 0 })
+
+    wrapper.unmount()
+  })
+
   it('setState should be binded to the component', () => {
     let wrapper = mount(
       <Bare
         constructor={cmp =>
-          cmp.state = {counter: 0}
+          cmp.state = { counter: 0 }
         }
-        didUpdate={({state, setState}) => {
+        didUpdate={({ state, setState }) => {
           if (state.counter === 0) {
-            setState({counter: state.counter + 1})
+            setState({ counter: state.counter + 1 })
           }
         }}
         render={'blah'}
       />
     )
 
-    expect(wrapper.state()).toEqual({counter: 0})
+    expect(wrapper.state()).toEqual({ counter: 0 })
 
     // force update
     wrapper.setState({})
 
-    expect(wrapper.state()).toEqual({counter: 1})
+    expect(wrapper.state()).toEqual({ counter: 1 })
 
     wrapper.unmount()
   })

@@ -35,6 +35,7 @@ export class Bare extends React.Component<{
 }> {
 
   previousPuritySource: any = null
+  self: React.Component
 
   constructor(props, ctx) {
     super(props, ctx)
@@ -48,11 +49,22 @@ export class Bare extends React.Component<{
       willUnmount
     } = props
 
-    this.setState = this.setState.bind(this)
+    this.self = this
 
+    // make setState usable inside the constructor
+    const originalSetState = this.setState.bind(this)
     if (isFunction(constructor)) {
+      this.setState = (updater?: any, callback?: () => void) => {
+        this.state = isFunction(updater) ? updater({}) : updater
+        if (isFunction(callback)) {
+          callback()
+        }
+      }
       constructor(this, props, ctx)
     }
+
+    this.setState = originalSetState.bind(this)
+    this.forceUpdate = this.forceUpdate.bind(this)
 
     if (isFunction(didCatch)) {
       this.componentDidCatch = prependArg(didCatch, this)
@@ -63,7 +75,7 @@ export class Bare extends React.Component<{
     }
 
     if (isFunction(didUpdate)) {
-      this.componentDidUpdate = prependArg(didUpdate, this)
+      this.componentDidUpdate = (_: any, prevState: any) => didUpdate(this, prevState)
     }
 
     if (pureBy !== void 0) {
@@ -84,7 +96,7 @@ export class Bare extends React.Component<{
         return should
       }
     } else if (isFunction(shouldUpdate)) {
-      this.shouldComponentUpdate = prependArg(shouldUpdate, this)
+      this.shouldComponentUpdate = (_: any, nextState: any) => shouldUpdate(this, nextState)
     }
 
     if (isFunction(willUnmount)) {
