@@ -2,11 +2,7 @@ import * as PropTypes from 'prop-types'
 import * as React from 'react'
 import { createElement, ReactElement } from 'react'
 
-export interface Mapper<T> {
-  <U>(value: T): U
-  <U>(value: T, key: number): U
-  <U>(value: T, key: number, target: T[]): U
-}
+export type Mapper<T> = (value?: T, key?: number, target?: T[]) => any;
 
 /**
  * Render the result of dispatching to the `map` method of `target`

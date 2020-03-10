@@ -63,6 +63,18 @@ describe('Map', () => {
     expect(wrapper.find('.item').length).toBe(3)
     wrapper.unmount()
   })
+
+  it('should allow index and target', () => {
+    const wrapper = mount(
+      <Map
+        target={[1, 2, 3]}
+        with={(_, idx: number, __) => <div key={idx} className={'item'} />}
+      />
+    )
+
+    expect(wrapper.find('.item').length).toBe(3)
+    wrapper.unmount()
+  })
 })
 
 describe('Switch', () => {
