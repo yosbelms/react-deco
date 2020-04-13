@@ -1,6 +1,6 @@
 {
   "name": "react-deco",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Declarative JSX glorification",
   "repository": "https://github.com/yosbelms/react-deco.git",
   "main": "lib/index.js",
