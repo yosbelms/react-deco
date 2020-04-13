@@ -151,6 +151,8 @@ Render the result of dispatching to the `map` method of `target` passing the `wi
 
 ### Bare
 
+> React Hooks addresses the same problem that this component was created for.
+
 A component that its `constructor`, `shouldComponentUpdate`, and lifecycle methods can be assigned via props
 
 ```tsx
