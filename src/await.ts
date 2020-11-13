@@ -13,42 +13,61 @@ export const enum Status {
  * Renders `catch` prop when the promise is rejected. Renders `placeholder` while the promise is not
  * resolved nor rejected.
  */
-export class Await<T extends any> extends React.Component<{
-  promise: Promise<T>
-  then: React.ReactElement<any> | ((value?: T) => React.ReactElement<any>)
-  catch?: any
+export class Await<T extends any> extends React.PureComponent<{
+  promise: Promise<T> | void
   placeholder?: any
+  then?: React.ReactElement<any> | ((value?: T) => React.ReactElement<any>)
+  catch?: any
 }, {
-  status: Status
-  value: T
-  failReason: any
+  loading: boolean
+  value: any
+  reason: any
 }> {
+  promise: Promise<any> | void
 
-  constructor(props, ctx) {
-    super(props, ctx)
+  constructor(props) {
+    super(props)
+    this.promise = null
     this.state = {
-      status: Status.AWAITING,
+      loading: true,
       value: void 0,
-      failReason: void 0
+      reason: void 0
     }
   }
 
-  componentDidMount() {
-    this.props.promise.then((value: T) => {
-      this.setState({ status: Status.SUCCESS, value: value })
-    }, (reason) => {
-      this.setState({ status: Status.FAILED, failReason: reason })
-    })
-  }
-
   render() {
-    switch (this.state.status) {
-      case Status.AWAITING:
-        return toElement(this.props.placeholder)
-      case Status.SUCCESS:
-        return toElement(this.props.then, this.state.value)
-      case Status.FAILED:
-        return toElement(this.props.catch, this.state.failReason)
+    const { promise, placeholder, then, catch: _catch } = this.props
+
+    if (!this.state.loading && this.promise && this.promise !== promise) {
+      Promise.resolve().then(() => this.setState({
+        loading: true
+      }))
+    }
+
+    this.promise = promise
+
+    if (promise && typeof promise.then === 'function') {
+      promise.then((value) => {
+        this.setState({
+          loading: false,
+          value: value,
+          reason: void 0
+        })
+      }, (reason) => {
+        this.setState({
+          loading: false,
+          value: void 0,
+          reason: reason
+        })
+      })
+    }
+
+    if (this.state.loading && placeholder) {
+      return toElement(placeholder)
+    } else if (this.state.value) {
+      return toElement(then, this.state.value)
+    } else if (this.state.reason) {
+      return toElement(_catch, this.state.reason)
     }
 
     return null
