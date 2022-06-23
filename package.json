@@ -26,7 +26,7 @@
     "jasmine": "^3.1.0",
     "jasmine-enzyme": "^7.1.1",
     "jasmine-ts": "^0.3.0",
-    "jsdom": "^15.2.0",
+    "jsdom": "^16.5.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "ts-node": "^8.0.3",
