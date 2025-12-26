@@ -22,6 +22,7 @@ const isArray = Array.isArray
 /**
  * A component that its `constructor`, `shouldComponentUpdate`, and lifecycle methods
  * can be assigned via props
+ * @deprecated React Hooks addresses the same problem that this component was created for.
  */
 export class Bare extends React.Component<{
   render: any

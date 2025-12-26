@@ -1,7 +1,7 @@
 
 const hasOwn = Object.prototype.hasOwnProperty
 
-export function isFunction(v) {
+export function isFunction(v: any) {
   return typeof v === 'function'
 }
 

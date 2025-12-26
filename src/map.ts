@@ -2,7 +2,7 @@ import * as PropTypes from 'prop-types'
 import * as React from 'react'
 import { createElement, ReactElement } from 'react'
 
-export type Mapper<T> = (value?: T, key?: number, target?: T[]) => any;
+export type Mapper<T> = (value: T, key: number, target: T[]) => any;
 
 /**
  * Render the result of dispatching to the `map` method of `target`

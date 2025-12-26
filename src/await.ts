@@ -1,82 +1,89 @@
-import * as React from 'react'
 import * as PropsTypes from 'prop-types'
 import { toElement } from './util'
+import { useState, useEffect, createElement, Fragment } from 'react'
 
-export const enum Status {
-  AWAITING = 0,
-  SUCCESS = 1,
-  FAILED = 2
+type AwaitState<T> = {
+  status: 'pending' | 'resolved' | 'rejected'
+  value?: T
+  error?: any
 }
 
-/**
- * Render components based on the state of a promise. Renders `then` prop when the promise is resolved.
- * Renders `catch` prop when the promise is rejected. Renders `placeholder` while the promise is not
- * resolved nor rejected.
- */
-export class Await<T extends any> extends React.PureComponent<{
+export function Await<T extends any>({
+  promise,
+  placeholder,
+  then,
+  catch: _catch,
+  finally: _finally,
+  showStaleData = false,
+}: {
   promise: Promise<T> | void
   placeholder?: any
-  then?: React.ReactElement<any> | ((value?: T) => React.ReactElement<any>)
+  then?: React.ReactElement<any> | ((value: T) => React.ReactElement<any> | null)
   catch?: any
-}, {
-  loading: boolean
-  value: any
-  reason: any
-}> {
-  promise: Promise<any> | void
+  finally?: any
+  showStaleData?: boolean
+}) {
+  const [state, setState] = useState<AwaitState<T>>({
+    status: 'pending',
+  })
 
-  constructor(props) {
-    super(props)
-    this.promise = null
-    this.state = {
-      loading: true,
-      value: void 0,
-      reason: void 0
+  useEffect(() => {
+    let isCancelled = false
+
+    if (!promise) {
+      setState({ status: 'resolved' })
+      return
     }
+
+    setState(prevState => {
+      if (showStaleData) {
+        return { ...prevState, status: 'pending' }
+      }
+      return { status: 'pending' }
+    })
+
+    promise.then((value) => {
+      if (!isCancelled) {
+        setState({ status: 'resolved', value })
+      }
+    }).catch((error) => {
+      if (!isCancelled) {
+        setState({ status: 'rejected', error })
+      }
+    })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [promise, showStaleData])
+
+  if (state.status === 'pending') {
+    if (showStaleData && state.value !== undefined) {
+      return frag(toElement(then, state.value), toElement(_finally))
+    }
+    return frag(toElement(placeholder), toElement(_finally))
   }
 
-  render() {
-    const { promise, placeholder, then, catch: _catch } = this.props
-
-    if (!this.state.loading && this.promise && this.promise !== promise) {
-      Promise.resolve().then(() => this.setState({
-        loading: true
-      }))
-    }
-
-    this.promise = promise
-
-    if (promise && typeof promise.then === 'function') {
-      promise.then((value) => {
-        this.setState({
-          loading: false,
-          value: value,
-          reason: void 0
-        })
-      }, (reason) => {
-        this.setState({
-          loading: false,
-          value: void 0,
-          reason: reason
-        })
-      })
-    }
-
-    if (this.state.loading && placeholder) {
-      return toElement(placeholder)
-    } else if (this.state.value) {
-      return toElement(then, this.state.value)
-    } else if (this.state.reason) {
-      return toElement(_catch, this.state.reason)
-    }
-
-    return null
+  if (state.status === 'resolved') {
+    return frag(toElement(then, state.value), toElement(_finally))
   }
+
+  if (state.status === 'rejected') {
+    return frag(toElement(_catch, state.error), toElement(_finally))
+  }
+
+  return toElement(_finally)
+}
+
+const frag = (...items: any[]) => {
+  return createElement(Fragment, null, ...items)
 }
 
 (Await as any).propTypes = {
-  promise: PropsTypes.any.isRequired,
+  promise: PropsTypes.any,
   then: PropsTypes.any.isRequired,
   placeholder: PropsTypes.any,
-  catch: PropsTypes.any
+  catch: PropsTypes.any,
+  finally: PropsTypes.any,
+  showStaleData: PropsTypes.bool,
 }
