@@ -11,6 +11,7 @@
   * [Map](#map)
   * [Await](#await)
   * [Memo](#memo)
+  * [TryCatch](#trycatch)
 
 ## Overview
 
@@ -94,13 +95,14 @@ npm install react-deco
 
 ```ts
 // ES2015+ and TS
-import {If, Map, Memo} from 'react-deco'
+import {If, Map, Memo, TryCatch} from 'react-deco'
 
 // CommonJS
 var ReactDeco = require('react-deco')
 var If = ReactDeco.If
 var Map = ReactDeco.Map
 var Memo = ReactDeco.Memo
+var TryCatch = ReactDeco.TryCatch
 ```
 
 ## Components
@@ -195,6 +197,24 @@ The `render` prop will only be re-evaluated if the `deps` array changes.
 
 * `deps`: An array of dependencies. The component will re-render only if the values in this array change.
 * `render`: A function that returns a React element to be rendered.
+
+### TryCatch
+
+A declarative error boundary to catch errors in a component subtree.
+
+```tsx
+<TryCatch
+  try={() => <MyComponentThatMightFail />}
+  catch={(error, errorInfo) => <p>Failed to render: {error.toString()}</p>}
+  onError={(error, errorInfo) => console.error('Caught an error:', error)}
+/>
+```
+
+`TryCatch` components accept the following props:
+
+* `try`: A function that returns the content to be rendered.
+* `catch`: A function that is called when an error is caught. It receives the `error` and `errorInfo` as arguments and should return the fallback content to be rendered.
+* `onError`: An optional function that is called when an error is caught. It receives the `error` and `errorInfo` as arguments. This is useful for logging errors or performing other side effects.
 
 Published under MIT License
 

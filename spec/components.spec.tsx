@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { If, Map, Switch, When, Bare, Await, Memo } from '../src';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { If, Map, Switch, When, Bare, Await, Memo, TryCatch } from '../src';
 
 function RenderIf({ test }: { test: any }) {
   return (
@@ -416,5 +416,73 @@ describe('Memo', () => {
 
     rerender(<Memo deps={[2]} render={() => <ComponentToMemo />} />);
     expect(renderFn).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('TryCatch', () => {
+  // Prevent jsdom from logging the error
+  beforeEach(() => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should render the try content when there is no error', () => {
+    render(
+      <TryCatch
+        try={() => <div className="try">Try</div>}
+        catch={() => <div className="catch">Catch</div>}
+      />
+    );
+    expect(screen.getByText('Try')).toBeInTheDocument();
+    expect(screen.queryByText('Catch')).not.toBeInTheDocument();
+  });
+
+  const ErrorComponent = () => {
+    throw new Error('boom');
+  };
+
+  it('should render the catch content when an error is thrown', () => {
+    render(
+      <TryCatch
+        try={() => <ErrorComponent />}
+        catch={() => <div className="catch">Catch</div>}
+      />
+    );
+    expect(screen.getByText('Catch')).toBeInTheDocument();
+  });
+
+  it('should pass the error and errorInfo to the catch render prop', () => {
+    const catchFn = vi.fn();
+    render(
+      <TryCatch
+        try={() => <ErrorComponent />}
+        catch={(error, errorInfo) => {
+          catchFn(error, errorInfo);
+          return null;
+        }}
+      />
+    );
+    expect(catchFn).toHaveBeenCalled();
+    expect(catchFn.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(catchFn.mock.calls[0][0].message).toBe('boom');
+    expect(catchFn.mock.calls[0][1]).toHaveProperty('componentStack');
+  });
+
+  it('should call onError when an error is thrown', () => {
+    const onError = vi.fn();
+    render(
+      <TryCatch
+        try={() => <ErrorComponent />}
+        catch={() => <div className="catch">Catch</div>}
+        onError={onError}
+      />
+    );
+    expect(onError).toHaveBeenCalled();
+    expect(onError.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(onError.mock.calls[0][0].message).toBe('boom');
+    expect(onError.mock.calls[0][1]).toHaveProperty('componentStack');
   });
 });
