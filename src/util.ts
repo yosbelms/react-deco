@@ -13,8 +13,8 @@ export function toBoolean(v) {
   return Boolean(isFunction(v) ? v() : v)
 }
 
-export function toElement(c, data = void 0) {
-  return defaultToNull(isFunction(c) ? c(data) : c)
+export function toElement(c: any, ...args: any[]) {
+  return defaultToNull(isFunction(c) ? c(...args) : c)
 }
 
 function is(x: any, y: any): boolean {

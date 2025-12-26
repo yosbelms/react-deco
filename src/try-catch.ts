@@ -34,7 +34,7 @@ export class TryCatch extends Component<{
 
   render() {
     return (this.state.hasError
-      ? toElement(this.props.catch, [this.state.error, this.state.errorInfo])
+      ? toElement(this.props.catch, this.state.error, this.state.errorInfo)
       : toElement(this.props.try)
     )
   }
